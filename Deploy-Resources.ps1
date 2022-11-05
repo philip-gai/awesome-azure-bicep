@@ -48,19 +48,18 @@ if (-not (Test-Path $templateParameterFile)) {
 
 Write-Host "Deploying ARM template '$templateFile' with parameters '$templateParameterFile'"
 
-if ($TemplateParameterObject.Count -gt 0) {
-    Write-Host "TemplateParameterObject:"
-    $TemplateParameterObject | Format-List
 
-    New-AzResourceGroupDeployment `
-        -ResourceGroupName $ResourceGroup `
-        -TemplateFile $templateFile `
-        -TemplateParameterFile $templateParameterFile `
-        $TemplateParameterObject
+$deploymentName = "$Resource-$(Get-Date -Format "yyyyMMddHHmmss")"
+$params = @{
+    Name                  = $deploymentName
+    ResourceGroupName     = $ResourceGroup
+    TemplateFile          = $templateFile
+    TemplateParameterFile = $templateParameterFile
 }
-else {
-    New-AzResourceGroupDeployment `
-        -ResourceGroupName $ResourceGroup `
-        -TemplateFile $templateFile `
-        -TemplateParameterFile $templateParameterFile
-}
+$params = $params + $TemplateParameterObject
+
+# Log the parameters
+Write-Host "Deployment parameters:"
+$params.GetEnumerator() | ForEach-Object { Write-Host "$($_.Key) = $($_.Value)" }
+
+New-AzResourceGroupDeployment @params
