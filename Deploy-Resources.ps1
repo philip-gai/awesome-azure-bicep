@@ -41,25 +41,24 @@ if (-not (Test-Path $templateFile)) {
     throw "Template file '$templateFile' does not exist"
 }
 
-$templateParameterFile = "$PSScriptRoot/$Resource/main.parameters.json"
-if (-not (Test-Path $templateParameterFile)) {
-    throw "Template parameter file '$templateParameterFile' does not exist"
-}
-
-Write-Host "Deploying ARM template '$templateFile' with parameters '$templateParameterFile'"
-
-
 $deploymentName = "$Resource-$(Get-Date -Format "yyyyMMddHHmmss")"
 $params = @{
     Name                  = $deploymentName
     ResourceGroupName     = $ResourceGroup
     TemplateFile          = $templateFile
-    TemplateParameterFile = $templateParameterFile
 }
 $params = $params + $TemplateParameterObject
+
+$templateParameterFile = "$PSScriptRoot/$Resource/main.parameters.json"
+if (Test-Path $templateParameterFile) {
+    Write-Host "Using template parameter file '$templateParameterFile'"
+    $params.TemplateParameterFile = $templateParameterFile
+}
 
 # Log the parameters
 Write-Host "Deployment parameters:"
 $params.GetEnumerator() | ForEach-Object { Write-Host "$($_.Key) = $($_.Value)" }
 
+Write-Host "Starting deployment"
 New-AzResourceGroupDeployment @params
+Write-Host "Deployment complete"

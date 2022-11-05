@@ -1,11 +1,11 @@
 @description('The name of the Managed Cluster resource.')
-param aksClusterName string
+param aksClusterName string = 'awesome-aks-cluster'
 
 @description('The location of AKS resource.')
 param location string = resourceGroup().location
 
 @description('DNS prefix to use with hosted Kubernetes API server FQDN.')
-param dnsPrefix string
+param dnsPrefix string = 'awesome-dns-prefix'
 
 @description('The SKU tier to use')
 param skuTier string = 'Free'
