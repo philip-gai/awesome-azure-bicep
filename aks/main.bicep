@@ -1,8 +1,11 @@
 @description('The name of the Managed Cluster resource.')
-param aksClusterName string = 'awesome-aks-cluster'
+param aksClusterName string
 
 @description('The location of AKS resource.')
 param location string = resourceGroup().location
+
+@description('DNS prefix to use with hosted Kubernetes API server FQDN.')
+param dnsPrefix string = aksClusterName
 
 @description('The SKU tier to use')
 param skuTier string = 'Free'
@@ -41,6 +44,7 @@ resource aksCluster 'Microsoft.ContainerService/managedClusters@2022-01-02-previ
     tier: skuTier
   }
   properties: {
+    dnsPrefix: dnsPrefix
     enableRBAC: true
     agentPoolProfiles: [
       {
